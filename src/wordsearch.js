@@ -1,48 +1,82 @@
 import { generateGrid } from './grid.js';
 
-const words = [
-  'banana', 'mango', 'lagos', 'naira', 'zebra',
-  'python', 'react', 'coded', 'music', 'dance',
-  'trade', 'money', 'books', 'hope', 'giant'
-];
+const categories = {
+  Fruits: ['BANANA', 'MANGO'],
+  Geography: ['LAGOS'],
+  Economy: ['NAIRA', 'TRADE', 'MONEY'],
+  Animals: ['ZEBRA'],
+  Technology: ['PYTHON', 'REACT', 'CODED'],
+  Arts: ['MUSIC', 'DANCE', 'BOOKS'],
+  Misc: ['HOPE', 'GIANT']
+};
 
+const allWords = Object.values(categories).flat();
 const gridSize = 12;
-const grid = generateGrid(words, gridSize);
 
 const gameContainer = document.getElementById('game');
-const gridEl = document.createElement('div');
-const wordListEl = document.createElement('div');
+const newGameBtn = document.getElementById('new-game');
 
-gridEl.className = 'grid';
-wordListEl.className = 'word-list';
-
-gridEl.style.setProperty('--grid-size', gridSize);
-
-grid.forEach((row, r) => {
-  row.forEach((letter, c) => {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.textContent = letter;
-    cell.dataset.row = r;
-    cell.dataset.col = c;
-    gridEl.appendChild(cell);
-  });
-});
-
-words.forEach((word) => {
-  const w = document.createElement('div');
-  w.textContent = word;
-  w.id = `word-${word}`;
-  wordListEl.appendChild(w);
-});
-
-gameContainer.appendChild(gridEl);
-gameContainer.appendChild(wordListEl);
-
+let gridEl;
+let wordListEl;
 let isMouseDown = false;
 let startCell = null;
 let currentPath = [];
-const foundWords = new Set();
+let foundWords = new Set();
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function initializeGame() {
+  gameContainer.innerHTML = '';
+  const grid = generateGrid(shuffle([...allWords]), gridSize);
+
+  gridEl = document.createElement('div');
+  wordListEl = document.createElement('div');
+  gridEl.className = 'grid';
+  wordListEl.className = 'word-list';
+  gridEl.style.setProperty('--grid-size', gridSize);
+
+  grid.forEach((row, r) => {
+    row.forEach((letter, c) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = letter.toUpperCase();
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      gridEl.appendChild(cell);
+    });
+  });
+
+  for (const [category, list] of Object.entries(categories)) {
+    const section = document.createElement('div');
+    const heading = document.createElement('h3');
+    heading.textContent = category;
+    section.appendChild(heading);
+    list.forEach((word) => {
+      const w = document.createElement('div');
+      w.textContent = word;
+      w.id = `word-${word}`;
+      section.appendChild(w);
+    });
+    wordListEl.appendChild(section);
+  }
+
+  gameContainer.appendChild(gridEl);
+  gameContainer.appendChild(wordListEl);
+
+  isMouseDown = false;
+  startCell = null;
+  currentPath = [];
+  foundWords = new Set();
+
+  gridEl.addEventListener('mousedown', handleMouseDown);
+  gridEl.addEventListener('mouseover', handleMouseOver);
+}
 
 function clearSelection() {
   currentPath.forEach((cell) => cell.classList.remove('selected'));
@@ -82,8 +116,8 @@ function checkSelection() {
   const letters = currentPath.map((c) => c.textContent).join('');
   const reversed = letters.split('').reverse().join('');
   let match = null;
-  if (words.includes(letters)) match = letters;
-  else if (words.includes(reversed)) match = reversed;
+  if (allWords.includes(letters)) match = letters;
+  else if (allWords.includes(reversed)) match = reversed;
 
   if (match && !foundWords.has(match)) {
     currentPath.forEach((c) => c.classList.add('found'));
@@ -93,26 +127,31 @@ function checkSelection() {
   }
 }
 
-gridEl.addEventListener('mousedown', (e) => {
+function handleMouseDown(e) {
   if (!e.target.classList.contains('cell')) return;
   isMouseDown = true;
   startCell = e.target;
   currentPath = [startCell];
   startCell.classList.add('selected');
-});
+}
 
-gridEl.addEventListener('mouseover', (e) => {
+function handleMouseOver(e) {
   if (!isMouseDown || !e.target.classList.contains('cell')) return;
   const path = getPath(startCell, e.target);
   if (!path) return;
   clearSelection();
   currentPath = path;
   currentPath.forEach((cell) => cell.classList.add('selected'));
-});
+}
 
-document.addEventListener('mouseup', () => {
+function handleMouseUp() {
   if (!isMouseDown) return;
   isMouseDown = false;
   checkSelection();
   clearSelection();
-});
+}
+
+document.addEventListener('mouseup', handleMouseUp);
+newGameBtn.addEventListener('click', initializeGame);
+
+initializeGame();

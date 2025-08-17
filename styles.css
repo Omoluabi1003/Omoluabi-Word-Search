@@ -33,6 +33,9 @@ body {
 
 .cell.found {
   background: #a0e7a0;
+  text-decoration: line-through;
+  text-decoration-color: red;
+  color: red;
 }
 
 .word-list {
@@ -44,5 +47,6 @@ body {
 
 .word-list .found {
   text-decoration: line-through;
-  color: green;
+  text-decoration-color: red;
+  color: red;
 }

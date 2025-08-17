@@ -12,7 +12,8 @@ export const directions = [
 export function generateGrid(words, gridSize = 12) {
   const grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(""));
 
-  for (const word of words) {
+  for (const rawWord of words) {
+    const word = rawWord.toUpperCase();
     let placed = false;
     for (let attempt = 0; attempt < 100 && !placed; attempt++) {
       const dir = directions[Math.floor(Math.random() * directions.length)];

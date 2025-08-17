@@ -1,10 +1,16 @@
 import { generateGrid } from '../src/grid.js';
 
-const words = [
-  'banana', 'mango', 'lagos', 'naira', 'zebra',
-  'python', 'react', 'coded', 'music', 'dance',
-  'trade', 'money', 'books', 'hope', 'giant'
-];
+const categories = {
+  Fruits: ['BANANA', 'MANGO'],
+  Geography: ['LAGOS'],
+  Economy: ['NAIRA', 'TRADE', 'MONEY'],
+  Animals: ['ZEBRA'],
+  Technology: ['PYTHON', 'REACT', 'CODED'],
+  Arts: ['MUSIC', 'DANCE', 'BOOKS'],
+  Misc: ['HOPE', 'GIANT'],
+};
+
+const words = Object.values(categories).flat();
 
 const gridSize = 12;
 const grid = generateGrid(words, gridSize);
