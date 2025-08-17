@@ -2,11 +2,7 @@ export const directions = [
   { dr: 0, dc: 1 },
   { dr: 0, dc: -1 },
   { dr: 1, dc: 0 },
-  { dr: -1, dc: 0 },
-  { dr: 1, dc: 1 },
-  { dr: -1, dc: -1 },
-  { dr: -1, dc: 1 },
-  { dr: 1, dc: -1 }
+  { dr: -1, dc: 0 }
 ];
 
 export function generateGrid(words, gridSize = 12) {
