@@ -70,6 +70,7 @@ function startGame() {
       const wEl = document.createElement('div');
       wEl.textContent = upperWord;
       wEl.id = `word-${upperWord}`;
+      wEl.className = 'word';
       section.appendChild(wEl);
     });
     wordListEl.appendChild(section);
