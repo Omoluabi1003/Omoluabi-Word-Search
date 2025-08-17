@@ -1,48 +1,86 @@
 import { generateGrid } from './grid.js';
 
-const words = [
-  'banana', 'mango', 'lagos', 'naira', 'zebra',
-  'python', 'react', 'coded', 'music', 'dance',
-  'trade', 'money', 'books', 'hope', 'giant'
-];
+const categories = {
+  Fruits: ['BANANA', 'MANGO'],
+  Places: ['LAGOS'],
+  Economy: ['NAIRA', 'TRADE', 'MONEY'],
+  Animals: ['ZEBRA'],
+  Technology: ['PYTHON', 'REACT', 'CODED'],
+  Arts: ['MUSIC', 'DANCE'],
+  Education: ['BOOKS'],
+  Virtues: ['HOPE', 'GIANT']
+};
 
 const gridSize = 12;
-const grid = generateGrid(words, gridSize);
-
 const gameContainer = document.getElementById('game');
-const gridEl = document.createElement('div');
-const wordListEl = document.createElement('div');
+const shuffleBtn = document.getElementById('shuffle');
 
-gridEl.className = 'grid';
-wordListEl.className = 'word-list';
-
-gridEl.style.setProperty('--grid-size', gridSize);
-
-grid.forEach((row, r) => {
-  row.forEach((letter, c) => {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.textContent = letter;
-    cell.dataset.row = r;
-    cell.dataset.col = c;
-    gridEl.appendChild(cell);
-  });
-});
-
-words.forEach((word) => {
-  const w = document.createElement('div');
-  w.textContent = word;
-  w.id = `word-${word}`;
-  wordListEl.appendChild(w);
-});
-
-gameContainer.appendChild(gridEl);
-gameContainer.appendChild(wordListEl);
-
+let gridEl;
+let wordListEl;
+let words = [];
 let isMouseDown = false;
 let startCell = null;
 let currentPath = [];
-const foundWords = new Set();
+let foundWords = new Set();
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function startGame() {
+  gameContainer.innerHTML = '';
+  foundWords = new Set();
+  isMouseDown = false;
+  startCell = null;
+  currentPath = [];
+
+  words = Object.values(categories).flat().map((w) => w.toUpperCase());
+  shuffle(words);
+
+  const grid = generateGrid(words, gridSize);
+
+  gridEl = document.createElement('div');
+  wordListEl = document.createElement('div');
+  gridEl.className = 'grid';
+  wordListEl.className = 'word-list';
+  gridEl.style.setProperty('--grid-size', gridSize);
+
+  grid.forEach((row, r) => {
+    row.forEach((letter, c) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = letter.toUpperCase();
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      gridEl.appendChild(cell);
+    });
+  });
+
+  for (const [category, list] of Object.entries(categories)) {
+    const section = document.createElement('div');
+    const title = document.createElement('div');
+    title.textContent = category;
+    title.className = 'category-title';
+    section.appendChild(title);
+    list.forEach((word) => {
+      const upperWord = word.toUpperCase();
+      const wEl = document.createElement('div');
+      wEl.textContent = upperWord;
+      wEl.id = `word-${upperWord}`;
+      section.appendChild(wEl);
+    });
+    wordListEl.appendChild(section);
+  }
+
+  gameContainer.appendChild(gridEl);
+  gameContainer.appendChild(wordListEl);
+
+  gridEl.addEventListener('mousedown', handleMouseDown);
+  gridEl.addEventListener('mouseover', handleMouseOver);
+}
 
 function clearSelection() {
   currentPath.forEach((cell) => cell.classList.remove('selected'));
@@ -93,26 +131,32 @@ function checkSelection() {
   }
 }
 
-gridEl.addEventListener('mousedown', (e) => {
+function handleMouseDown(e) {
   if (!e.target.classList.contains('cell')) return;
   isMouseDown = true;
   startCell = e.target;
   currentPath = [startCell];
   startCell.classList.add('selected');
-});
+}
 
-gridEl.addEventListener('mouseover', (e) => {
+function handleMouseOver(e) {
   if (!isMouseDown || !e.target.classList.contains('cell')) return;
   const path = getPath(startCell, e.target);
   if (!path) return;
   clearSelection();
   currentPath = path;
   currentPath.forEach((cell) => cell.classList.add('selected'));
-});
+}
 
-document.addEventListener('mouseup', () => {
+function handleMouseUp() {
   if (!isMouseDown) return;
   isMouseDown = false;
   checkSelection();
   clearSelection();
-});
+}
+
+document.addEventListener('mouseup', handleMouseUp);
+shuffleBtn.addEventListener('click', startGame);
+
+startGame();
+
