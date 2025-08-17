@@ -1,9 +1,9 @@
 import { generateGrid } from '../src/grid.js';
 
 const words = [
-  'banana', 'mango', 'lagos', 'naira', 'zebra',
-  'python', 'react', 'coded', 'music', 'dance',
-  'trade', 'money', 'books', 'hope', 'giant'
+  'BANANA', 'MANGO', 'LAGOS', 'NAIRA', 'ZEBRA',
+  'PYTHON', 'REACT', 'CODED', 'MUSIC', 'DANCE',
+  'TRADE', 'MONEY', 'BOOKS', 'HOPE', 'GIANT'
 ];
 
 const gridSize = 12;
