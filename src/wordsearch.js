@@ -1,19 +1,16 @@
 import { generateGrid } from './grid.js';
 
 const categories = {
-  Fruits: ['BANANA', 'MANGO'],
-  Places: ['LAGOS'],
-  Economy: ['NAIRA', 'TRADE', 'MONEY'],
-  Animals: ['ZEBRA'],
-  Technology: ['PYTHON', 'REACT', 'CODED'],
-  Arts: ['MUSIC', 'DANCE'],
-  Education: ['BOOKS'],
-  Virtues: ['HOPE', 'GIANT']
+  Fruits: ['BANANA', 'MANGO', 'ORANGE', 'PAWPAW', 'GUAVA'],
+  Animals: ['ZEBRA', 'LION', 'GOAT', 'SNAKE', 'ELEPHANT'],
+  Technology: ['PYTHON', 'REACT', 'CODE'],
+  'Nigerian States': ['LAGOS', 'KANO', 'ENUGU', 'ABIA', 'BENUE', 'DELTA', 'KWARA', 'ONDO', 'OSUN', 'KATSINA']
 };
 
 const gridSize = 12;
 const gameContainer = document.getElementById('game');
-const shuffleBtn = document.getElementById('shuffle');
+const categorySelect = document.getElementById('category');
+const startBtn = document.getElementById('start');
 
 let gridEl;
 let wordListEl;
@@ -30,14 +27,25 @@ function shuffle(arr) {
   }
 }
 
+function populateCategories() {
+  Object.keys(categories).forEach((cat) => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
+  categorySelect.value = Object.keys(categories)[0];
+}
+
 function startGame() {
+  const category = categorySelect.value || Object.keys(categories)[0];
   gameContainer.innerHTML = '';
   foundWords = new Set();
   isMouseDown = false;
   startCell = null;
   currentPath = [];
 
-  words = Object.values(categories).flat().map((w) => w.toUpperCase());
+  words = categories[category].map((w) => w.toUpperCase());
   shuffle(words);
 
   const grid = generateGrid(words, gridSize);
@@ -59,22 +67,13 @@ function startGame() {
     });
   });
 
-  for (const [category, list] of Object.entries(categories)) {
-    const section = document.createElement('div');
-    const title = document.createElement('div');
-    title.textContent = category;
-    title.className = 'category-title';
-    section.appendChild(title);
-    list.forEach((word) => {
-      const upperWord = word.toUpperCase();
-      const wEl = document.createElement('div');
-      wEl.textContent = upperWord;
-      wEl.id = `word-${upperWord}`;
-      wEl.className = 'word';
-      section.appendChild(wEl);
-    });
-    wordListEl.appendChild(section);
-  }
+  words.forEach((word) => {
+    const wEl = document.createElement('div');
+    wEl.textContent = word;
+    wEl.id = `word-${word}`;
+    wEl.className = 'word';
+    wordListEl.appendChild(wEl);
+  });
 
   gameContainer.appendChild(gridEl);
   gameContainer.appendChild(wordListEl);
@@ -102,7 +101,7 @@ function getPath(start, end) {
   const stepR = dr === 0 ? 0 : dr / Math.abs(dr);
   const stepC = dc === 0 ? 0 : dc / Math.abs(dc);
 
-  if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return null;
+  if (dr !== 0 && dc !== 0) return null;
 
   const length = Math.max(Math.abs(dr), Math.abs(dc)) + 1;
   const path = [];
@@ -157,7 +156,9 @@ function handleMouseUp() {
 }
 
 document.addEventListener('mouseup', handleMouseUp);
-shuffleBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', startGame);
+categorySelect.addEventListener('change', startGame);
 
+populateCategories();
 startGame();
 
